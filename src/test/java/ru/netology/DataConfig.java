@@ -4,6 +4,8 @@ import com.github.javafaker.Faker;
 
 import java.util.Locale;
 
+import static io.restassured.RestAssured.given;
+
 public class DataConfig {
 
     private DataConfig() {
@@ -29,6 +31,5 @@ public class DataConfig {
     public static UserData generateData(boolean isActive) {
         return new UserData(getLogin(), getPassword(), activeAccount(isActive));
     }
-
-
+    
 }

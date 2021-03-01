@@ -7,6 +7,7 @@ import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import static com.codeborne.selenide.Selectors.withText;
 import static com.codeborne.selenide.Selenide.$;
@@ -27,7 +28,7 @@ public class ApiTest {
             .build();
 
     @Test
-    void shouldCreateAccount(UserData someUser){
+    void shouldCreateActiveAccount(){
                  given()
                 .spec(requestSpec)
                 .body(user)
@@ -38,8 +39,18 @@ public class ApiTest {
     }
 
     @Test
+    void shouldCreateBlockedAccount(){
+        given()
+                .spec(requestSpec)
+                .body(blockedUser)
+                .when()
+                .post("/api/system/users")
+                .then()
+                .statusCode(200);
+    }
+    @Test
     void shouldOpenAccount(){
-        shouldCreateAccount(user);
+        shouldCreateActiveAccount();
         open("http://localhost:9999");
         SelenideElement form = $("[id = root]");
         form.$("[data-test-id=login] input").setValue(user.getLogin());
@@ -51,7 +62,7 @@ public class ApiTest {
 
     @Test
     void shouldNotOpenBlockedAccount(){
-        shouldCreateAccount(blockedUser);
+        shouldCreateBlockedAccount();
         open("http://localhost:9999");
         SelenideElement form = $("[id = root]");
         form.$("[data-test-id=login] input").setValue(blockedUser.getLogin());
@@ -63,7 +74,7 @@ public class ApiTest {
 
     @Test
     void shouldNotOpenIfInvalidLogin(){
-        shouldCreateAccount(user);
+        shouldCreateActiveAccount();
         open("http://localhost:9999");
         SelenideElement form = $("[id = root]");
         form.$("[data-test-id=login] input").setValue(blockedUser.getLogin());
@@ -75,7 +86,7 @@ public class ApiTest {
 
     @Test
     void shouldNotOpenIfInvalidPassword(){
-        shouldCreateAccount(user);
+        shouldCreateActiveAccount();
         open("http://localhost:9999");
         SelenideElement form = $("[id = root]");
         form.$("[data-test-id=login] input").setValue(user.getLogin());
